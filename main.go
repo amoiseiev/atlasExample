@@ -1,0 +1,40 @@
+package main
+
+import (
+	"atlasExample/db"
+	_ "embed"
+	"fmt"
+	_ "github.com/jackc/pgx/v5/stdlib"
+)
+
+func main() {
+	prodDBConfig := db.DBConfig{
+		User:       "app",
+		Password:   "",
+		Host:       "localhost",
+		Name:       "atlas_example",
+		Schema:     "",
+		DisableTLS: true,
+	}
+
+	atlasDevDBConfig := db.DBConfig{
+		User:       "app",
+		Password:   "",
+		Host:       "localhost",
+		Name:       "atlas_example_test",
+		Schema:     "",
+		DisableTLS: true,
+	}
+
+	psqlDB, err := db.New(prodDBConfig, atlasDevDBConfig)
+	if err != nil {
+		panic("Cannot open the databases: " + err.Error())
+	}
+
+	err = psqlDB.ReconcileWithAtlasSQLSchema(db.SchemaSQL)
+	if err != nil {
+		panic("Database cannot be reconciled with its Atlas Schema: " + err.Error())
+	}
+
+	fmt.Println("Database has been initialized and reconciled with its schema")
+}

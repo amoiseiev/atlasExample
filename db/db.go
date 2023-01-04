@@ -14,7 +14,7 @@ import (
 )
 
 //go:embed sql/schema.sql
-var SchemaSQL string
+var BuiltInSQLSchema []byte
 
 // DBConfig is the configuration for Postgres connection
 type DBConfig struct {
@@ -31,13 +31,12 @@ type PostgresDB struct {
 	atlasDevDB *sqlx.DB
 }
 
-func (r *PostgresDB) getDBDesiredStateFromAtlas(sqlSchema string, devDBAtlasDriver atlasmigrate.Driver) (atlasmigrate.StateReader, error) {
+func (r *PostgresDB) getDBDesiredStateFromAtlas(sqlSchema []byte, devDBAtlasDriver atlasmigrate.Driver) (atlasmigrate.StateReader, error) {
 	ctx := context.Background()
 
-	b := []byte(sqlSchema)
 	dir := &atlasmigrate.MemDir{}
 
-	if err := dir.WriteFile("schemaAtlas.sql", b); err != nil {
+	if err := dir.WriteFile("schemaAtlas.sql", sqlSchema); err != nil {
 		return nil, errors.New("Cannot write into MemDir " + err.Error())
 	}
 
@@ -56,7 +55,7 @@ func (r *PostgresDB) getDBDesiredStateFromAtlas(sqlSchema string, devDBAtlasDriv
 	return atlasmigrate.Realm(sr), nil
 }
 
-func (r *PostgresDB) ReconcileWithAtlasSQLSchema(schemaSQL string) error {
+func (r *PostgresDB) ReconcileWithAtlasSQLSchema(schemaSQL []byte) error {
 	prodDBAtlasDriver, err := atlaspostgres.Open(r.prod.DB)
 	if err != nil {
 		return errors.New("Error opening source connection driver: " + err.Error())
@@ -67,14 +66,14 @@ func (r *PostgresDB) ReconcileWithAtlasSQLSchema(schemaSQL string) error {
 		return errors.New("Error opening dev connection driver: " + err.Error())
 	}
 
-	ctx := context.Background()
-
-	desiredStateReader, err := r.getDBDesiredStateFromAtlas(SchemaSQL, devDBAtlasDriver)
+	desiredStateReader, err := r.getDBDesiredStateFromAtlas(schemaSQL, devDBAtlasDriver)
 	if err != nil {
 		return err
 	}
 
 	currentStateReader := atlasmigrate.RealmConn(prodDBAtlasDriver, &atlasschema.InspectRealmOption{})
+
+	ctx := context.Background()
 
 	desiredState, err := desiredStateReader.ReadState(ctx)
 	if err != nil {
@@ -92,7 +91,7 @@ func (r *PostgresDB) ReconcileWithAtlasSQLSchema(schemaSQL string) error {
 	}
 
 	if len(changes) > 0 {
-		prodDBAtlasDriver.ApplyChanges(ctx, changes)
+		err = prodDBAtlasDriver.ApplyChanges(ctx, changes)
 		if err != nil {
 			return errors.New("Failed to apply changes: " + err.Error())
 		}

@@ -31,7 +31,7 @@ func main() {
 		panic("Cannot open the databases: " + err.Error())
 	}
 
-	err = psqlDB.ReconcileWithAtlasSQLSchema(db.SchemaSQL)
+	err = psqlDB.ReconcileWithAtlasSQLSchema(db.BuiltInSQLSchema)
 	if err != nil {
 		panic("Database cannot be reconciled with its Atlas Schema: " + err.Error())
 	}

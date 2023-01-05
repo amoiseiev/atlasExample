@@ -1,6 +1,6 @@
 -- Add new schema named "myschema"
 CREATE SCHEMA "myschema";
--- create "user" table
+-- create "accounts" table
 CREATE TABLE "myschema"."accounts" (
                           "user_id" serial PRIMARY KEY,
                           "username" VARCHAR ( 50 ) UNIQUE NOT NULL,

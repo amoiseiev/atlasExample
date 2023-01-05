@@ -10,19 +10,15 @@ import (
 func main() {
 	prodDBConfig := db.DBConfig{
 		User:       "app",
-		Password:   "",
 		Host:       "localhost",
 		Name:       "atlas_example",
-		Schema:     "",
 		DisableTLS: true,
 	}
 
 	atlasDevDBConfig := db.DBConfig{
 		User:       "app",
-		Password:   "",
 		Host:       "localhost",
 		Name:       "atlas_example_test",
-		Schema:     "",
 		DisableTLS: true,
 	}
 

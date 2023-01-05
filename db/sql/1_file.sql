@@ -7,5 +7,5 @@ CREATE TABLE "myschema"."accounts" (
                           "password" VARCHAR ( 50 ) NOT NULL,
                           "email" VARCHAR ( 255 ) UNIQUE NOT NULL,
                           "created_on" TIMESTAMP NOT NULL,
-                          "last_login" TIMESTAMP NULL
+                          "last_login" TIMESTAMP NOT NULL
 );

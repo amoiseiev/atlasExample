@@ -2,13 +2,14 @@ package main
 
 import (
 	"atlasExample/db"
+	"atlasExample/db/sql"
 	_ "embed"
 	"fmt"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
-	prodDBConfig := db.DBConfig{
+	dstDBConfig := db.DBConfig{
 		User:       "app",
 		Host:       "localhost",
 		Name:       "atlas_example",
@@ -22,15 +23,20 @@ func main() {
 		DisableTLS: true,
 	}
 
-	psqlDB, err := db.New(prodDBConfig, atlasDevDBConfig)
+	dstDB, err := db.OpenDB(dstDBConfig)
 	if err != nil {
-		panic("Cannot open the databases: " + err.Error())
+		panic("Cannot open the database: " + err.Error())
 	}
 
-	err = psqlDB.ReconcileWithAtlasSQLSchema(db.BuiltInSQLSchema)
+	atlasDevDB, err := db.OpenDB(atlasDevDBConfig)
 	if err != nil {
-		panic("Database cannot be reconciled with its Atlas Schema: " + err.Error())
+		panic("cannot open the database: " + err.Error())
 	}
 
-	fmt.Println("Database has been initialized and reconciled with its schema")
+	err = db.ReconcileWithAtlasSQLSchema(sql.SchemaFiles, dstDB, atlasDevDB)
+	if err != nil {
+		panic("database cannot be reconciled with its Atlas Schema: " + err.Error())
+	}
+
+	fmt.Println("database has been initialized and reconciled with its schema")
 }

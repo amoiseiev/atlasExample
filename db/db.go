@@ -27,8 +27,8 @@ type DBConfig struct {
 }
 
 type PostgresDB struct {
-	prod       *sqlx.DB
-	atlasDevDB *sqlx.DB
+	prod     *sqlx.DB
+	atlasDev *sqlx.DB
 }
 
 func (r *PostgresDB) getDBDesiredStateFromAtlas(sqlSchema []byte, devDBAtlasDriver atlasmigrate.Driver) (atlasmigrate.StateReader, error) {
@@ -61,7 +61,7 @@ func (r *PostgresDB) ReconcileWithAtlasSQLSchema(schemaSQL []byte) error {
 		return errors.New("Error opening source connection driver: " + err.Error())
 	}
 
-	devDBAtlasDriver, err := atlaspostgres.Open(r.atlasDevDB.DB)
+	devDBAtlasDriver, err := atlaspostgres.Open(r.atlasDev.DB)
 	if err != nil {
 		return errors.New("Error opening dev connection driver: " + err.Error())
 	}
@@ -111,7 +111,7 @@ func New(prodDBConfig, atlasDevDBConfig DBConfig) (*PostgresDB, error) {
 		return nil, err
 	}
 
-	return &PostgresDB{prod: prodDB, atlasDevDB: atlasDevDB}, nil
+	return &PostgresDB{prod: prodDB, atlasDev: atlasDevDB}, nil
 }
 
 // OpenDB Opens SQLx connection to Postgres

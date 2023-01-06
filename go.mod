@@ -3,7 +3,7 @@ module atlasExample
 go 1.19
 
 require (
-	ariga.io/atlas v0.8.4-0.20230104140213-f975cd897e1d
+	ariga.io/atlas v0.9.0
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/jmoiron/sqlx v1.3.5
 )

@@ -1,5 +1,3 @@
 # atlasExample
 
-Example for simple, single PostgreSQL database schema reconciliation using Atlas as a Go library.
-
-No ORM, just SQLx with PGX.
+Example for simple, declarative PostgreSQL database schema reconciliation using Atlas Go library and SQL DDL. No ORM.

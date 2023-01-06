@@ -1,11 +1,10 @@
 package main
 
 import (
-	"atlasExample/db"
-	"atlasExample/db/sql"
-	_ "embed"
+	"atlasExample/business/data"
+	"atlasExample/business/data/dbschema"
+	"atlasExample/foundation/db"
 	"fmt"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
@@ -25,7 +24,7 @@ func main() {
 
 	dstDB, err := db.OpenDB(dstDBConfig)
 	if err != nil {
-		panic("Cannot open the database: " + err.Error())
+		panic("cannot open the database: " + err.Error())
 	}
 
 	atlasDevDB, err := db.OpenDB(atlasDevDBConfig)
@@ -33,7 +32,8 @@ func main() {
 		panic("cannot open the database: " + err.Error())
 	}
 
-	err = db.ReconcileWithAtlasSQLSchema(sql.SchemaFiles, dstDB, atlasDevDB)
+	atlas := data.NewAtlas()
+	err = atlas.ReconcileWithAtlasSQLSchema(dbschema.SQLFiles, dstDB, atlasDevDB)
 	if err != nil {
 		panic("database cannot be reconciled with its Atlas Schema: " + err.Error())
 	}

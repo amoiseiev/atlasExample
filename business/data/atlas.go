@@ -1,4 +1,4 @@
-package db
+package data
 
 import (
 	atlasmigrate "ariga.io/atlas/sql/migrate"
@@ -10,8 +10,14 @@ import (
 	"io/fs"
 )
 
+type Atlas struct{}
+
+func NewAtlas() *Atlas {
+	return &Atlas{}
+}
+
 // getDBDesiredStateFromAtlasSQLDirectory Returns a StateReader for the desired state based on files in the migration dir
-func getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, devDBAtlasDriver atlasmigrate.Driver) (
+func (r Atlas) getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, devDBAtlasDriver atlasmigrate.Driver) (
 	atlasmigrate.StateReader, error) {
 	// scratchDir is used as not all directories are local and may not allow "write" operations used for check sum
 	// calculation.
@@ -60,7 +66,7 @@ func getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, devDBAtlasD
 }
 
 // ReconcileWithAtlasSQLSchema Executes unattended schema reconciliation against destination database.
-func ReconcileWithAtlasSQLSchema(atlasMigrationDir fs.FS, dstDB *sqlx.DB, atlasDevDB *sqlx.DB) error {
+func (r Atlas) ReconcileWithAtlasSQLSchema(atlasMigrationDir fs.FS, dstDB *sqlx.DB, atlasDevDB *sqlx.DB) error {
 	// initializing Atlas Drivers for the destination and Atlas Dev databases.
 	dstDBAtlasDriver, err := atlaspostgres.Open(dstDB)
 	if err != nil {
@@ -76,7 +82,7 @@ func ReconcileWithAtlasSQLSchema(atlasMigrationDir fs.FS, dstDB *sqlx.DB, atlasD
 	ctx := context.Background()
 
 	// getting state for our desired and current configs, desired config is validated against Atlas Dev DB.
-	desiredStateReader, err := getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir, atlasDevDBAtlasDriver)
+	desiredStateReader, err := r.getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir, atlasDevDBAtlasDriver)
 	if err != nil {
 		return fmt.Errorf("db/atlas: cannot read desired state reader: %w", err)
 	}

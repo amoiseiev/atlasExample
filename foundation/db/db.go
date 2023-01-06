@@ -1,7 +1,7 @@
 package db
 
 import (
-	_ "embed"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"net/url"
 )

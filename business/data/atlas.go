@@ -20,7 +20,7 @@ func NewAtlas() *Atlas {
 func (r *Atlas) getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, devDBAtlasDriver atlasmigrate.Driver) (
 	atlasmigrate.StateReader, error) {
 	// scratchDir is used as not all directories are local and may not allow "write" operations used for check sum
-	// calculation.
+	// calculation. In practice, it also allows for embed.FS support.
 	scratchDir := &atlasmigrate.MemDir{}
 
 	// getting all sql files from the supplied FS and aborting when no files are found as a failsafe.

@@ -17,7 +17,7 @@ func NewAtlas() *Atlas {
 }
 
 // getDBDesiredStateFromAtlasSQLDirectory Returns a StateReader for the desired state based on files in the migration dir
-func (r Atlas) getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, devDBAtlasDriver atlasmigrate.Driver) (
+func (r *Atlas) getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, devDBAtlasDriver atlasmigrate.Driver) (
 	atlasmigrate.StateReader, error) {
 	// scratchDir is used as not all directories are local and may not allow "write" operations used for check sum
 	// calculation.
@@ -66,7 +66,7 @@ func (r Atlas) getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, d
 }
 
 // ReconcileWithAtlasSQLSchema Executes unattended schema reconciliation against destination database.
-func (r Atlas) ReconcileWithAtlasSQLSchema(atlasMigrationDir fs.FS, dstDB *sqlx.DB, atlasDevDB *sqlx.DB) error {
+func (r *Atlas) ReconcileWithAtlasSQLSchema(atlasMigrationDir fs.FS, dstDB *sqlx.DB, atlasDevDB *sqlx.DB) error {
 	// initializing Atlas Drivers for the destination and Atlas Dev databases.
 	dstDBAtlasDriver, err := atlaspostgres.Open(dstDB)
 	if err != nil {

@@ -5,7 +5,6 @@ go 1.19
 require (
 	ariga.io/atlas v0.9.0
 	github.com/jackc/pgx/v5 v5.2.0
-	github.com/jmoiron/sqlx v1.3.5
 )
 
 require (

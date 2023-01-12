@@ -1,8 +1,8 @@
 package db
 
 import (
+	"database/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/jmoiron/sqlx"
 	"net/url"
 )
 
@@ -17,7 +17,7 @@ type DBConfig struct {
 }
 
 // OpenDB Opens SQLx connection to Postgres
-func OpenDB(cfg DBConfig) (*sqlx.DB, error) {
+func OpenDB(cfg DBConfig) (*sql.DB, error) {
 	sslMode := "require"
 	if cfg.DisableTLS {
 		sslMode = "disable"
@@ -38,7 +38,7 @@ func OpenDB(cfg DBConfig) (*sqlx.DB, error) {
 		RawQuery: q.Encode(),
 	}
 
-	db, err := sqlx.Open("pgx", u.String())
+	db, err := sql.Open("pgx", u.String())
 	if err != nil {
 		return nil, err
 	}

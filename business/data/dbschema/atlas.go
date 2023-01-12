@@ -1,12 +1,12 @@
-package data
+package dbschema
 
 import (
 	atlasmigrate "ariga.io/atlas/sql/migrate"
 	atlaspostgres "ariga.io/atlas/sql/postgres"
 	atlasschema "ariga.io/atlas/sql/schema"
 	"context"
+	"database/sql"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"io/fs"
 )
 
@@ -65,8 +65,8 @@ func (r *Atlas) getDBDesiredStateFromAtlasSQLDirectory(atlasMigrationDir fs.FS, 
 	return atlasmigrate.Realm(sr), nil
 }
 
-// ReconcileWithAtlasSQLSchema Executes unattended schema reconciliation against destination database.
-func (r *Atlas) ReconcileWithAtlasSQLSchema(atlasMigrationDir fs.FS, dstDB *sqlx.DB, atlasDevDB *sqlx.DB) error {
+// ReconcileWithDeclaredSQLSchema Executes unattended schema reconciliation against destination database.
+func (r *Atlas) ReconcileWithDeclaredSQLSchema(atlasMigrationDir fs.FS, dstDB *sql.DB, atlasDevDB *sql.DB) error {
 	// initializing Atlas Drivers for the destination and Atlas Dev databases.
 	dstDBAtlasDriver, err := atlaspostgres.Open(dstDB)
 	if err != nil {

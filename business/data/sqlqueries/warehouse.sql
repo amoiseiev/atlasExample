@@ -1,12 +1,11 @@
 -- name: GetWarehouses :many
-SELECT * FROM warehouses;
+SELECT *
+FROM warehouses;
 
 -- name: CreateWarehouse :exec
-INSERT INTO warehouses (
-    name
-) VALUES (
-             $1
-         );
+INSERT INTO warehouses (name)
+VALUES ($1);
 
 -- name: DeleteAllWarehouses :exec
-DELETE FROM warehouses;
+DELETE
+FROM warehouses;

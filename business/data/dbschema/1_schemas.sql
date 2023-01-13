@@ -1,1 +1,1 @@
-CREATE SCHEMA "shop";
+CREATE SCHEMA shop;

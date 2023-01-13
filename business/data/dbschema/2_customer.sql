@@ -34,3 +34,5 @@ CREATE TABLE "addresses" (
                              FOREIGN KEY (account_id) REFERENCES accounts (id) ON DELETE CASCADE ,
                              FOREIGN KEY (state_id) REFERENCES address_states (id) ON DELETE CASCADE
 );
+CREATE INDEX addresses_account_id_idx ON addresses (account_id);
+CREATE INDEX addresses_state_id_idx ON addresses (state_id);

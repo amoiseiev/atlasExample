@@ -2,10 +2,11 @@
 // versions:
 //   sqlc v1.16.0
 
-package datacustomer
+package customer
 
 import (
-	"github.com/jackc/pgx/v5/pgtype"
+	"database/sql"
+	"time"
 )
 
 type Account struct {
@@ -14,20 +15,20 @@ type Account struct {
 	Password  string
 	FullName  string
 	Email     string
-	CreatedOn pgtype.Timestamp
-	LastLogin pgtype.Timestamp
+	CreatedOn time.Time
+	LastLogin sql.NullTime
 }
 
 type Address struct {
 	ID            int32
 	AccountID     int32
 	Address1      string
-	Address2      pgtype.Text
+	Address2      sql.NullString
 	City          string
 	StateID       int32
 	ZipCode       int16
 	RecipientName string
-	AddedOn       pgtype.Timestamp
+	AddedOn       time.Time
 }
 
 type AddressState struct {

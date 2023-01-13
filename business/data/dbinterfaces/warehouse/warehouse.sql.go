@@ -3,13 +3,13 @@
 //   sqlc v1.16.0
 // source: warehouse.sql
 
-package datawarehouse
+package warehouse
 
 import (
 	"context"
 )
 
-const CreateWarehouse = `-- name: CreateWarehouse :exec
+const createWarehouse = `-- name: CreateWarehouse :exec
 INSERT INTO warehouses (
     name
 ) VALUES (
@@ -18,25 +18,25 @@ INSERT INTO warehouses (
 `
 
 func (q *Queries) CreateWarehouse(ctx context.Context, name string) error {
-	_, err := q.db.Exec(ctx, CreateWarehouse, name)
+	_, err := q.db.ExecContext(ctx, createWarehouse, name)
 	return err
 }
 
-const DeleteAllWarehouses = `-- name: DeleteAllWarehouses :exec
+const deleteAllWarehouses = `-- name: DeleteAllWarehouses :exec
 DELETE FROM warehouses
 `
 
 func (q *Queries) DeleteAllWarehouses(ctx context.Context) error {
-	_, err := q.db.Exec(ctx, DeleteAllWarehouses)
+	_, err := q.db.ExecContext(ctx, deleteAllWarehouses)
 	return err
 }
 
-const GetWarehouses = `-- name: GetWarehouses :many
+const getWarehouses = `-- name: GetWarehouses :many
 SELECT id, name FROM warehouses
 `
 
 func (q *Queries) GetWarehouses(ctx context.Context) ([]Warehouse, error) {
-	rows, err := q.db.Query(ctx, GetWarehouses)
+	rows, err := q.db.QueryContext(ctx, getWarehouses)
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +48,9 @@ func (q *Queries) GetWarehouses(ctx context.Context) ([]Warehouse, error) {
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

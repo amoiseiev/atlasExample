@@ -3,12 +3,12 @@
 //   sqlc v1.16.0
 // source: customer.sql
 
-package datacustomer
+package customer
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"database/sql"
+	"time"
 )
 
 const addAddressToAccount = `-- name: AddAddressToAccount :exec
@@ -22,7 +22,7 @@ INSERT INTO addresses (
 type AddAddressToAccountParams struct {
 	AccountID     int32
 	Address1      string
-	Address2      pgtype.Text
+	Address2      sql.NullString
 	City          string
 	StateID       int32
 	ZipCode       int16
@@ -30,7 +30,7 @@ type AddAddressToAccountParams struct {
 }
 
 func (q *Queries) AddAddressToAccount(ctx context.Context, arg AddAddressToAccountParams) error {
-	_, err := q.db.Exec(ctx, addAddressToAccount,
+	_, err := q.db.ExecContext(ctx, addAddressToAccount,
 		arg.AccountID,
 		arg.Address1,
 		arg.Address2,
@@ -48,7 +48,7 @@ RETURNING id, name
 `
 
 func (q *Queries) AddState(ctx context.Context, name string) (AddressState, error) {
-	row := q.db.QueryRow(ctx, addState, name)
+	row := q.db.QueryRowContext(ctx, addState, name)
 	var i AddressState
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
@@ -71,7 +71,7 @@ type CreateAccountParams struct {
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
-	row := q.db.QueryRow(ctx, createAccount,
+	row := q.db.QueryRowContext(ctx, createAccount,
 		arg.FullName,
 		arg.Email,
 		arg.Username,
@@ -96,7 +96,7 @@ WHERE id = $1
 `
 
 func (q *Queries) DeleteAccount(ctx context.Context, id int32) error {
-	_, err := q.db.Exec(ctx, deleteAccount, id)
+	_, err := q.db.ExecContext(ctx, deleteAccount, id)
 	return err
 }
 
@@ -105,7 +105,7 @@ DELETE FROM accounts
 `
 
 func (q *Queries) DeleteAllAccounts(ctx context.Context) error {
-	_, err := q.db.Exec(ctx, deleteAllAccounts)
+	_, err := q.db.ExecContext(ctx, deleteAllAccounts)
 	return err
 }
 
@@ -115,7 +115,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetAccount(ctx context.Context, id int32) (Account, error) {
-	row := q.db.QueryRow(ctx, getAccount, id)
+	row := q.db.QueryRowContext(ctx, getAccount, id)
 	var i Account
 	err := row.Scan(
 		&i.ID,
@@ -139,17 +139,17 @@ type GetAccountAddressesRow struct {
 	ID            int32
 	AccountID     int32
 	Address1      string
-	Address2      pgtype.Text
+	Address2      sql.NullString
 	City          string
 	StateID       int32
 	ZipCode       int16
 	RecipientName string
-	AddedOn       pgtype.Timestamp
-	StateName     pgtype.Text
+	AddedOn       time.Time
+	StateName     sql.NullString
 }
 
 func (q *Queries) GetAccountAddresses(ctx context.Context, accountID int32) ([]GetAccountAddressesRow, error) {
-	rows, err := q.db.Query(ctx, getAccountAddresses, accountID)
+	rows, err := q.db.QueryContext(ctx, getAccountAddresses, accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +173,9 @@ func (q *Queries) GetAccountAddresses(ctx context.Context, accountID int32) ([]G
 		}
 		items = append(items, i)
 	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -185,7 +188,7 @@ ORDER BY created_on
 `
 
 func (q *Queries) GetAllAccounts(ctx context.Context) ([]Account, error) {
-	rows, err := q.db.Query(ctx, getAllAccounts)
+	rows, err := q.db.QueryContext(ctx, getAllAccounts)
 	if err != nil {
 		return nil, err
 	}
@@ -206,6 +209,9 @@ func (q *Queries) GetAllAccounts(ctx context.Context) ([]Account, error) {
 		}
 		items = append(items, i)
 	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -225,7 +231,7 @@ type UpdateAccountParams struct {
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) ([]Account, error) {
-	rows, err := q.db.Query(ctx, updateAccount,
+	rows, err := q.db.QueryContext(ctx, updateAccount,
 		arg.ID,
 		arg.FullName,
 		arg.Email,
@@ -251,6 +257,9 @@ func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) ([
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"atlasExample/business/data"
+	"atlasExample/business/data/dbinterfaces/customer"
+	"atlasExample/business/data/dbinterfaces/warehouse"
 	"atlasExample/business/data/dbschema"
-	datacustomer "atlasExample/business/data/queries/customer"
-	datawarehouse "atlasExample/business/data/queries/warehouse"
 	"atlasExample/foundation/db"
 	"context"
 	"database/sql"
@@ -36,7 +37,7 @@ func initdb() (*sql.DB, error) {
 		panic("cannot open the database: " + err.Error())
 	}
 
-	atlas := dbschema.NewAtlas()
+	atlas := data.NewAtlas()
 	err = atlas.ReconcileWithDeclaredSQLSchema(dbschema.SQLFiles, appDB, atlasDevDB)
 	if err != nil {
 		return nil, fmt.Errorf("database cannot be reconciled with its Atlas Schema: %w", err)
@@ -55,8 +56,8 @@ func main() {
 
 	ctx := context.Background()
 
-	customers := datacustomer.New(appDB)
-	c, err := customers.CreateAccount(ctx, datacustomer.CreateAccountParams{
+	customers := customer.New(appDB)
+	c, err := customers.CreateAccount(ctx, customer.CreateAccountParams{
 		FullName: "John The Customer",
 		Email:    "john@example.com",
 		Username: "john",
@@ -68,7 +69,7 @@ func main() {
 	fmt.Printf("Customer info: %v", c)
 
 	s, _ := customers.AddState(ctx, "New York")
-	customers.AddAddressToAccount(ctx, datacustomer.AddAddressToAccountParams{
+	customers.AddAddressToAccount(ctx, customer.AddAddressToAccountParams{
 		AccountID:     c.ID,
 		Address1:      "123 Main Street",
 		Address2:      sql.NullString{},
@@ -78,16 +79,15 @@ func main() {
 		RecipientName: "",
 	})
 
-	customers.UpdateAccount(ctx, datacustomer.UpdateAccountParams{
+	customers.UpdateAccount(ctx, customer.UpdateAccountParams{
 		ID:       c.ID,
 		FullName: "Moreno",
 		Email:    "moreno.com",
 		Username: "m",
 		Password: "p",
 	})
-	customers.w
 
-	warehouses := datawarehouse.New(appDB)
+	warehouses := warehouse.New(appDB)
 	err = warehouses.CreateWarehouse(ctx, "Middleborough")
 	if err != nil {
 		fmt.Println("Customer creation issue: ", err.Error())

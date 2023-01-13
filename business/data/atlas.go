@@ -1,4 +1,4 @@
-package dbschema
+package data
 
 import (
 	atlasmigrate "ariga.io/atlas/sql/migrate"

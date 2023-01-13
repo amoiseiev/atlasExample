@@ -1,0 +1,16 @@
+version: "2"
+sql:
+  - schema: "dbschema/2_customer.sql"
+    engine: "postgresql"
+    queries: "sqlqueries/customer.sql"
+    gen:
+      go:
+        package: "customer"
+        out: "dbinterfaces/customer"
+  - schema: "dbschema/3_warehouse.sql"
+    engine: "postgresql"
+    queries: "sqlqueries/warehouse.sql"
+    gen:
+      go:
+        package: "warehouse"
+        out: "dbinterfaces/warehouse"
